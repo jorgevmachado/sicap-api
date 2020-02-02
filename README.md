@@ -6,3 +6,5 @@
 #### JPA
 #### h2database
 #### mysql
+#### spring-boot-starter-security
+#### JWT 0.7.0

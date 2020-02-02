@@ -1,5 +1,8 @@
 package br.com.jorgevmachado.sicapapi.services;
 
+import br.com.jorgevmachado.sicapapi.domain.enumerations.Perfil;
+import br.com.jorgevmachado.sicapapi.securities.UserSpringSecurity;
+import br.com.jorgevmachado.sicapapi.services.esceptions.AuthorizationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,10 @@ public class ClienteService {
     }
 
     public Cliente findById(Integer id) {
+        UserSpringSecurity user = UserService.authenticated();
+        if (user == null ||  !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+            throw new AuthorizationException("Acesso negado");
+        }
         Optional<Cliente> obj = repository.findById(id);
         return obj.orElseThrow(
                 () -> new ObjectNotFoundException(
@@ -53,7 +60,7 @@ public class ClienteService {
         Cliente newObj = findById(id);
         newObj.setNome(obj.getNome());
         newObj.setEmail(obj.getEmail());
-        newObj.setCpf(obj.getCpf());
+        newObj.setCpfCnpj(obj.getCpfCnpj());
         newObj.setTipo(obj.getTipo());
         newObj.setSenha(obj.getSenha());
         newObj.setDataAtualizacao(LocalDateTime.now());
